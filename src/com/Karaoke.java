@@ -22,6 +22,7 @@ public class Karaoke {
         SongBook songBook = new SongBook();
         KaraokeMachine machine = new KaraokeMachine(songBook);
         machine.run();
+        
     }
     
 }
