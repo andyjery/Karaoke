@@ -5,11 +5,19 @@
  */
 package com.JDevelop.model;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  *
@@ -22,6 +30,42 @@ public class SongBook {
         mSongs = new ArrayList<>();
     }
     
+    public void exportTo(String fileName)
+    {
+        try (
+                FileOutputStream fos = new FileOutputStream(fileName);
+                PrintWriter writer = new PrintWriter(fos);
+            )
+        {
+            for (Song song : mSongs)
+            {
+                writer.printf("%s|%s|%s%n", song.getmArtist(), song.getmTitle(), song.getmVideoUrl());
+            }
+        } catch (IOException ioe) {
+            System.out.printf("Problem saving %s %n", fileName);
+            ioe.printStackTrace();
+        }
+    }
+    
+    public void importFrom(String fileName)
+    {
+        try (
+                FileInputStream fis = new FileInputStream(fileName);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+            )
+        {
+            String line;
+            while((line = reader.readLine()) != null)
+            {
+                String[] args = line.split("\\|");
+                addSong(new Song(args[0], args[1], args[2]));
+            }
+        } catch (IOException ioe) {
+            System.out.printf("Problems loading %s %n", fileName);
+            ioe.printStackTrace();
+        }
+    }
+    
     public void addSong(Song song) {
         mSongs.add(song);
     }
@@ -32,7 +76,7 @@ public class SongBook {
     
     public Map<String, List<Song>> byArtist()
     {
-        Map<String, List<Song>> byArtist = new HashMap<>();
+        Map<String, List<Song>> byArtist = new TreeMap<>();
         for(Song song:mSongs)
         {
             List<Song> artistSongs = byArtist.get(song.getmArtist());
@@ -53,6 +97,17 @@ public class SongBook {
     
     public List<Song> getSongsForArtist(String artistName)
     {
-        return byArtist().get(artistName);
+        List<Song> songs = byArtist().get(artistName);
+        Collections.sort(songs, new Comparator<Song>(){
+            @Override
+            public int compare(Song song1, Song song2) {
+                if(song1.equals(song2))
+                {
+                    return 0;
+                }
+                return song1.mTitle.compareTo(song2.mTitle);
+            }
+        });
+        return songs;
     }
 }
