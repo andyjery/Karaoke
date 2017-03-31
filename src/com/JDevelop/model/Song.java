@@ -10,9 +10,9 @@ package com.JDevelop.model;
  * @author Jerry
  */
 public class Song {
-    private String mArtist;
-    private String mTitle;
-    private String mVideoUrl;
+    protected String mArtist;
+    protected String mTitle;
+    protected String mVideoUrl;
 
     public Song(String artist, String title, String videoUrl) {
         this.mArtist = artist;
